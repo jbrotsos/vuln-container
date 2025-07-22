@@ -7,6 +7,11 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Intentional hardcoded secrets for testing security scanners
+const DATABASE_PASSWORD = 'SuperSecret123!';
+const API_KEY = 'sk-abcd1234567890abcdef1234567890ab';
+const JWT_SECRET = 'super-weak-secret-key-123';
+
 // Middleware
 app.use(express.json());
 
@@ -47,8 +52,8 @@ app.post('/template', (req, res) => {
 app.post('/jwt', (req, res) => {
     const payload = req.body.payload || { user: 'testuser' };
     
-    // Using a weak secret and vulnerable JWT version
-    const token = jwt.sign(payload, 'weak-secret', { algorithm: 'HS256' });
+    // Using the hardcoded weak secret (vulnerable)
+    const token = jwt.sign(payload, JWT_SECRET, { algorithm: 'HS256' });
     
     res.json({ token });
 });
