@@ -32,7 +32,7 @@ jobs:
       with:
         context: .
         push: false
-        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:latest
         load: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -43,4 +43,4 @@ jobs:
         tools: 'trivy'
       env:
         GDN_TRIVY_ACTION: image
-        GDN_TRIVY_TARGET: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        GDN_TRIVY_TARGET: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:latest

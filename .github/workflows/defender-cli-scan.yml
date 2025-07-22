@@ -28,7 +28,7 @@ jobs:
       with:
         context: .
         push: false
-        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:latest
         load: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -128,10 +128,10 @@ jobs:
         
         # Run the actual scan command
         echo "Running Defender scan command..."
-        echo "Command: $CLI_EXECUTABLE scan image ${{ vars.ARTIFACT_NAME }}"
+        echo "Command: $CLI_EXECUTABLE scan image ${{ vars.ARTIFACT_NAME }}:latest"
         
         # Execute the scan command (may fail without proper authentication)
-        $CLI_EXECUTABLE scan image ${{ vars.ARTIFACT_NAME }} || {
+        $CLI_EXECUTABLE scan image ${{ vars.ARTIFACT_NAME }}:latest || {
           echo "❌ Scan command failed - this may be due to:"
           echo "1. Missing authentication credentials"
           echo "2. Network connectivity issues" 
