@@ -72,11 +72,21 @@ This repository includes several GitHub Actions workflows for automated building
    - Counts vulnerabilities by severity level
    - Uploads scan artifacts for review
 
-3. **`build-test.yml`** - Development build testing
+3. **`build.yml`** - Container build and basic testing
    - Runs on feature branches (not main/master)
-   - Quick build verification and basic functionality tests
-   - Basic container health checks
-   - Quick security scan (high/critical only)
+   - Builds Docker image with caching
+   - Performs basic container functionality tests
+   - Health check validation
+
+4. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
+   - Runs on feature branches or manual dispatch
+   - Uses Microsoft Security DevOps Action with Trivy
+   - Integrates with Microsoft security tooling
+
+5. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
+   - Runs on feature branches or manual dispatch
+   - Focuses on high and critical severity vulnerabilities only
+   - Fast feedback for development iterations
 
 ### 📊 Security Integration
 

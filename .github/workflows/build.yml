@@ -1,4 +1,4 @@
-name: Build Test
+name: Build Container
 
 on:
   push:
@@ -7,11 +7,9 @@ on:
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
 
 jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -30,14 +28,6 @@ jobs:
         load: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        
-    - name: Run Microsoft Security DevOps Action
-      uses: microsoft/security-devops-action@latest
-      with:
-        tools: 'trivy'
-      env:
-        GDN_TRIVY_ACTION: image
-        GDN_TRIVY_TARGET: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
         
     - name: Test container runs
       run: |
@@ -58,11 +48,3 @@ jobs:
         # Stop and remove container
         docker stop test-container
         docker rm test-container
-        
-    - name: Quick Trivy scan (High/Critical only)
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: '${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test'
-        format: 'table'
-        severity: 'CRITICAL,HIGH'
-        exit-code: '0'  # Don't fail the build, just report
