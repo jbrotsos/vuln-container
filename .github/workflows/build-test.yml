@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  security-events: write
+  actions: read
 
 jobs:
   build-test:
@@ -28,6 +30,14 @@ jobs:
         load: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        
+    - name: Run Microsoft Security DevOps Action
+      uses: microsoft/security-devops-action@latest
+      with:
+        tools: 'trivy'
+      env:
+        GDN_TRIVY_ACTION: image
+        GDN_TRIVY_TARGET: vulnerable-app:test
         
     - name: Test container runs
       run: |
