@@ -59,15 +59,17 @@ This repository includes several GitHub Actions workflows for automated building
 
 ### 🔧 Workflows
 
-1. **`security-scan.yml`** - Main security scanning workflow
-   - Triggers on push to main branches, PRs, and weekly schedule
+**⚠️ Note: Most workflows are currently disabled and only run manually. Only `defender-cli-scan.yml` runs automatically.**
+
+1. **`security-scan.yml`** - Main security scanning workflow **[DISABLED]**
+   - Manual trigger only (workflow_dispatch)
    - Builds Docker image with caching
    - Runs comprehensive Trivy scans (SARIF, JSON, table formats)
    - Uploads results to GitHub Security tab
    - Includes container security, config, filesystem, and secret scans
 
-2. **`pr-security-check.yml`** - Pull request security validation
-   - Runs on all pull requests
+2. **`pr-security-check.yml`** - Pull request security validation **[DISABLED]**
+   - Manual trigger only (workflow_dispatch)
    - Provides detailed vulnerability summary in PR comments
    - Counts vulnerabilities by severity level
    - Uploads scan artifacts for review
@@ -78,22 +80,22 @@ This repository includes several GitHub Actions workflows for automated building
    - Efficient Docker layer caching
    - Outputs built image name for downstream jobs
 
-4. **`build.yml`** - Container build and basic testing
-   - Triggers on push/PR to main branches or manual dispatch
+4. **`build.yml`** - Container build and basic testing **[DISABLED]**
+   - Manual trigger only (workflow_dispatch)
    - Uses reusable build workflow with container testing enabled
    - Health check validation
 
-5. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
-   - Triggers on push/PR to main branches or manual dispatch
+5. **`msdo-scan.yml`** - Microsoft Security DevOps scanning **[DISABLED]**
+   - Manual trigger only (workflow_dispatch)
    - Builds Docker image and runs Microsoft Security DevOps Action
    - Integrates with Microsoft security tooling
 
-6. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
-   - Triggers on push/PR to main branches or manual dispatch
+6. **`quick-trivy-scan.yml`** - Quick vulnerability assessment **[DISABLED]**
+   - Manual trigger only (workflow_dispatch)
    - Builds Docker image and runs focused Trivy scan
    - Fast feedback for development iterations
 
-7. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
+7. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning **[ACTIVE]**
    - Triggers on push/PR to main branches or manual dispatch
    - Builds Docker image and runs auto-detecting CLI download
    - Requires secret credentials configuration for full functionality
@@ -107,10 +109,20 @@ This repository includes several GitHub Actions workflows for automated building
 
 ### 🚀 Usage
 
-The workflows run automatically, but you can also trigger them manually:
+**Currently Active Workflows:**
+- Only `defender-cli-scan.yml` runs automatically on main branch pushes and PRs
+
+**Disabled Workflows:**
+- All other workflows are set to manual trigger only (`workflow_dispatch`)
 - Go to Actions tab in your GitHub repository
 - Select the workflow you want to run
 - Click "Run workflow"
+
+**To Re-enable Disabled Workflows:**
+1. Edit the workflow file (e.g., `.github/workflows/security-scan.yml`)
+2. Uncomment the `on:` section with push/pull_request triggers
+3. Comment out or remove the manual-only `on: workflow_dispatch:` section
+4. Commit and push the changes
 
 ## Warning
 

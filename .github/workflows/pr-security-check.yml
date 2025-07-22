@@ -1,8 +1,12 @@
 name: PR Security Check
 
+# Workflow disabled - uncomment to re-enable
+# on:
+#   pull_request:
+#     branches: [ main, master ]
+
 on:
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch:  # Manual trigger only
 
 permissions:
   contents: read
