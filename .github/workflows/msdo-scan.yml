@@ -11,25 +11,19 @@ permissions:
   actions: read
 
 jobs:
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      image-tag: 'test'
+      run-tests: false
+      
   msdo-scan:
     runs-on: ubuntu-latest
+    needs: build
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: Build Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: false
-        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
-        load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
         
     - name: Run Microsoft Security DevOps Action
       uses: microsoft/security-devops-action@latest
@@ -37,4 +31,4 @@ jobs:
         tools: 'trivy'
       env:
         GDN_TRIVY_ACTION: image
-        GDN_TRIVY_TARGET: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        GDN_TRIVY_TARGET: ${{ needs.build.outputs.image-name }}

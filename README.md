@@ -72,26 +72,30 @@ This repository includes several GitHub Actions workflows for automated building
    - Counts vulnerabilities by severity level
    - Uploads scan artifacts for review
 
-3. **`build.yml`** - Container build and basic testing
+3. **`reusable-build.yml`** - Reusable Docker build workflow
+   - Used by other workflows to eliminate duplicate builds
+   - Configurable image tagging and optional container testing
+   - Efficient Docker layer caching
+   - Outputs built image name for downstream jobs
+
+4. **`build.yml`** - Container build and basic testing
    - Runs on feature branches (not main/master)
-   - Builds Docker image with caching
-   - Performs basic container functionality tests
+   - Uses reusable build workflow with container testing enabled
    - Health check validation
 
-4. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
+5. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
    - Runs on feature branches or manual dispatch
-   - Uses Microsoft Security DevOps Action with Trivy
+   - Uses reusable build workflow + Microsoft Security DevOps Action
    - Integrates with Microsoft security tooling
 
-5. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
+6. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
    - Runs on feature branches or manual dispatch
-   - Focuses on high and critical severity vulnerabilities only
+   - Uses reusable build workflow + focused Trivy scan
    - Fast feedback for development iterations
 
-6. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
+7. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
    - Runs on feature branches or manual dispatch
-   - Auto-detects OS and architecture for appropriate CLI download
-   - Downloads and runs Microsoft Defender CLI
+   - Uses reusable build workflow + auto-detecting CLI download
    - Requires secret credentials configuration for full functionality
 
 ### 📊 Security Integration

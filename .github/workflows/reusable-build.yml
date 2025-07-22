@@ -1,0 +1,75 @@
+name: Reusable Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      image-tag:
+        description: 'Docker image tag to use'
+        required: false
+        type: string
+        default: 'test'
+      run-tests:
+        description: 'Whether to run container tests'
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      image-name:
+        description: 'Full Docker image name with tag'
+        value: ${{ jobs.build.outputs.image-name }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-name: ${{ steps.image-info.outputs.full-name }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Set image information
+      id: image-info
+      run: |
+        FULL_NAME="${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:${{ inputs.image-tag }}"
+        echo "full-name=$FULL_NAME" >> $GITHUB_OUTPUT
+        echo "Building image: $FULL_NAME"
+        
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: ${{ steps.image-info.outputs.full-name }}
+        load: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Test container runs
+      if: ${{ inputs.run-tests }}
+      run: |
+        echo "Running container functionality tests..."
+        
+        # Start container in background
+        docker run -d -p 3000:3000 --name test-container ${{ steps.image-info.outputs.full-name }}
+        
+        # Wait for container to start
+        sleep 10
+        
+        # Test health endpoint
+        curl -f http://localhost:3000/health || exit 1
+        
+        # Test root endpoint
+        curl -f http://localhost:3000/ || exit 1
+        
+        echo "✅ Container started successfully and endpoints are responding"
+        
+        # Stop and remove container
+        docker stop test-container
+        docker rm test-container

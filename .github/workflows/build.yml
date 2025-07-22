@@ -10,41 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: Build Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: false
-        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
-        load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Test container runs
-      run: |
-        # Start container in background
-        docker run -d -p 3000:3000 --name test-container ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
-        
-        # Wait for container to start
-        sleep 10
-        
-        # Test health endpoint
-        curl -f http://localhost:3000/health || exit 1
-        
-        # Test root endpoint
-        curl -f http://localhost:3000/ || exit 1
-        
-        echo "✅ Container started successfully and endpoints are responding"
-        
-        # Stop and remove container
-        docker stop test-container
-        docker rm test-container
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      image-tag: 'test'
+      run-tests: true
