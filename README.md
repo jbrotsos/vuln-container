@@ -79,22 +79,22 @@ This repository includes several GitHub Actions workflows for automated building
    - Outputs built image name for downstream jobs
 
 4. **`build.yml`** - Container build and basic testing
-   - Runs on feature branches (not main/master)
+   - Triggers on push/PR to main branches or manual dispatch
    - Uses reusable build workflow with container testing enabled
    - Health check validation
 
 5. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
-   - Runs on feature branches or manual dispatch
+   - Triggers on push/PR to main branches or manual dispatch
    - Uses reusable build workflow + Microsoft Security DevOps Action
    - Integrates with Microsoft security tooling
 
 6. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
-   - Runs on feature branches or manual dispatch
+   - Triggers on push/PR to main branches or manual dispatch
    - Uses reusable build workflow + focused Trivy scan
    - Fast feedback for development iterations
 
 7. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
-   - Runs on feature branches or manual dispatch
+   - Triggers on push/PR to main branches or manual dispatch
    - Uses reusable build workflow + auto-detecting CLI download
    - Requires secret credentials configuration for full functionality
 
