@@ -88,6 +88,12 @@ This repository includes several GitHub Actions workflows for automated building
    - Focuses on high and critical severity vulnerabilities only
    - Fast feedback for development iterations
 
+6. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
+   - Runs on feature branches or manual dispatch
+   - Auto-detects OS and architecture for appropriate CLI download
+   - Downloads and runs Microsoft Defender CLI
+   - Requires secret credentials configuration for full functionality
+
 ### 📊 Security Integration
 
 - **SARIF Upload**: Results appear in GitHub's Security tab

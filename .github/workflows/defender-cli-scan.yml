@@ -1,0 +1,139 @@
+name: Defender CLI Scan
+
+on:
+  push:
+    branches-ignore: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  defender-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        load: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Detect OS and Architecture
+      id: detect-os
+      run: |
+        OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        
+        # Map GitHub runner OS to Defender CLI naming
+        case "$OS" in
+          "linux")
+            DEFENDER_OS="linux"
+            ;;
+          "windows")
+            DEFENDER_OS="win"
+            ;;
+          "macos")
+            DEFENDER_OS="osx"
+            ;;
+          *)
+            DEFENDER_OS="linux"  # Default fallback
+            ;;
+        esac
+        
+        # Map architecture to Defender CLI naming
+        case "$ARCH" in
+          "x86_64"|"amd64")
+            DEFENDER_ARCH="x64"
+            ;;
+          "aarch64"|"arm64")
+            DEFENDER_ARCH="arm64"
+            ;;
+          "i386"|"i686")
+            DEFENDER_ARCH="x86"
+            ;;
+          *)
+            DEFENDER_ARCH="x64"  # Default fallback
+            ;;
+        esac
+        
+        # Determine file extension
+        if [ "$DEFENDER_OS" = "win" ]; then
+          EXTENSION=".exe"
+        else
+          EXTENSION=""
+        fi
+        
+        DEFENDER_FILENAME="Defender_${DEFENDER_OS}-${DEFENDER_ARCH}${EXTENSION}"
+        DOWNLOAD_URL="https://dfdclirelease-fde-c4fjdhc6dcceetet.b02.azurefd.net/public/latest/${DEFENDER_FILENAME}"
+        
+        echo "os=$DEFENDER_OS" >> $GITHUB_OUTPUT
+        echo "arch=$DEFENDER_ARCH" >> $GITHUB_OUTPUT
+        echo "filename=$DEFENDER_FILENAME" >> $GITHUB_OUTPUT
+        echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+        echo "extension=$EXTENSION" >> $GITHUB_OUTPUT
+        
+        echo "Detected OS: $DEFENDER_OS"
+        echo "Detected Architecture: $DEFENDER_ARCH"
+        echo "Defender CLI filename: $DEFENDER_FILENAME"
+        echo "Download URL: $DOWNLOAD_URL"
+        
+    - name: Download Defender CLI
+      run: |
+        echo "Downloading Defender CLI from: ${{ steps.detect-os.outputs.download_url }}"
+        curl -L -o defender-cli${{ steps.detect-os.outputs.extension }} "${{ steps.detect-os.outputs.download_url }}"
+        
+        # Make executable if not Windows
+        if [ "${{ steps.detect-os.outputs.extension }}" != ".exe" ]; then
+          chmod +x defender-cli
+        fi
+        
+        # Verify download
+        ls -la defender-cli*
+        
+    - name: Run Defender CLI Scan
+      run: |
+        echo "Running Defender CLI scan..."
+        
+        # Set the CLI executable name
+        if [ "${{ steps.detect-os.outputs.extension }}" = ".exe" ]; then
+          CLI_EXECUTABLE="./defender-cli.exe"
+        else
+          CLI_EXECUTABLE="./defender-cli"
+        fi
+        
+        # Run the scan (basic command - will need authentication setup)
+        # Note: This will likely fail without proper credentials/authentication
+        # User will need to add secret credentials and configure the scan parameters
+        
+        echo "Defender CLI executable: $CLI_EXECUTABLE"
+        
+        # Test if CLI runs (basic help/version check)
+        if $CLI_EXECUTABLE --help 2>/dev/null || $CLI_EXECUTABLE -h 2>/dev/null || $CLI_EXECUTABLE --version 2>/dev/null; then
+          echo "✅ Defender CLI downloaded and accessible"
+        else
+          echo "⚠️ Defender CLI downloaded but may need authentication/configuration"
+          echo "Please add the necessary secret credentials and scan parameters"
+        fi
+        
+        # Placeholder for actual scan command
+        # TODO: Add proper scan command with authentication
+        # Example: $CLI_EXECUTABLE scan --target ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
+        
+    - name: Upload Defender CLI results (placeholder)
+      if: always()
+      run: |
+        echo "Placeholder for uploading Defender CLI scan results"
+        echo "Results would be uploaded as artifacts here once scan is properly configured"
