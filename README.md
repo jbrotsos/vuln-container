@@ -85,17 +85,17 @@ This repository includes several GitHub Actions workflows for automated building
 
 5. **`msdo-scan.yml`** - Microsoft Security DevOps scanning
    - Triggers on push/PR to main branches or manual dispatch
-   - Uses reusable build workflow + Microsoft Security DevOps Action
+   - Builds Docker image and runs Microsoft Security DevOps Action
    - Integrates with Microsoft security tooling
 
 6. **`quick-trivy-scan.yml`** - Quick vulnerability assessment
    - Triggers on push/PR to main branches or manual dispatch
-   - Uses reusable build workflow + focused Trivy scan
+   - Builds Docker image and runs focused Trivy scan
    - Fast feedback for development iterations
 
 7. **`defender-cli-scan.yml`** - Microsoft Defender CLI scanning
    - Triggers on push/PR to main branches or manual dispatch
-   - Uses reusable build workflow + auto-detecting CLI download
+   - Builds Docker image and runs auto-detecting CLI download
    - Requires secret credentials configuration for full functionality
 
 ### 📊 Security Integration
