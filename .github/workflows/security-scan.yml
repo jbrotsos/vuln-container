@@ -10,6 +10,11 @@ on:
     - cron: '0 2 * * 0'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
@@ -39,10 +44,22 @@ jobs:
         output: 'trivy-results.sarif'
         
     - name: Upload Trivy scan results to GitHub Security tab
+      id: upload-sarif
       uses: github/codeql-action/upload-sarif@v3
-      if: always()
+      if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      continue-on-error: true
       with:
         sarif_file: 'trivy-results.sarif'
+        
+    - name: Check if SARIF upload failed
+      if: always() && steps.upload-sarif.outcome == 'failure'
+      run: |
+        echo "⚠️ SARIF upload to Security tab failed. This might be due to:"
+        echo "1. Repository permissions (security-events permission needed)"
+        echo "2. Repository settings (Advanced Security features might need to be enabled)"
+        echo "3. Organization policies"
+        echo ""
+        echo "✅ Security scan results are still available as artifacts and in the workflow logs."
         
     - name: Run Trivy scanner (JSON format)
       uses: aquasecurity/trivy-action@master
