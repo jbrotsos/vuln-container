@@ -26,7 +26,7 @@ jobs:
       with:
         context: .
         push: false
-        tags: vulnerable-app:test
+        tags: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
         load: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -37,12 +37,12 @@ jobs:
         tools: 'trivy'
       env:
         GDN_TRIVY_ACTION: image
-        GDN_TRIVY_TARGET: vulnerable-app:test
+        GDN_TRIVY_TARGET: ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
         
     - name: Test container runs
       run: |
         # Start container in background
-        docker run -d -p 3000:3000 --name test-container vulnerable-app:test
+        docker run -d -p 3000:3000 --name test-container ${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test
         
         # Wait for container to start
         sleep 10
@@ -62,7 +62,7 @@ jobs:
     - name: Quick Trivy scan (High/Critical only)
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'vulnerable-app:test'
+        image-ref: '${{ vars.REGISTRY_HOST }}/${{ vars.ARTIFACT_NAME }}:test'
         format: 'table'
         severity: 'CRITICAL,HIGH'
         exit-code: '0'  # Don't fail the build, just report
